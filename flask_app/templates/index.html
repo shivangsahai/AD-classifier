@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EEG Based Alzheimer's Detection</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <nav>
+    <strong>EEG Based Alzheimer's Detection</strong>
+    <a href="#home">Home</a><a href="#predict">Predict</a><a href="#about">Overview</a><a href="#algorithm">Model</a><a href="#eeg">EEG Guide</a>
+  </nav>
+
+  <header id="home" class="hero">
+    <div>
+      <p class="eyebrow">Final Year Machine Learning Project</p>
+      <h1>EEG Based Alzheimer's Detection</h1>
+      <p class="lead">A light web interface for early risk screening using 16-channel EEG signals, engineered statistical features, and an XGBoost classifier.</p>
+      <a class="primary" href="#predict">Start Prediction</a>
+    </div>
+    <div class="hero-visual" aria-label="Static EEG signal preview">
+      <div class="brain-card">
+        <div class="brain">
+          <span>Fp1</span><span>Fp2</span><span>F7</span><span>F8</span><span>C3</span><span>C4</span><span>P3</span><span>P4</span>
+        </div>
+        <div class="signal">
+          <svg viewBox="0 0 520 180" role="img" aria-label="Static EEG waveform">
+            <path d="M0 92 H38 L48 62 L63 126 L82 92 H130 L145 72 L160 110 L176 92 H230 L240 50 L257 132 L275 92 H325 L340 74 L356 112 L372 92 H420 L434 58 L451 126 L470 92 H520" />
+            <path d="M0 132 H60 L74 112 L89 150 L104 132 H170 L186 104 L204 158 L220 132 H284 L300 112 L315 150 L332 132 H396 L412 98 L430 164 L448 132 H520" />
+          </svg>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section id="predict">
+      <div class="section-title">
+        <p class="eyebrow">Prediction</p>
+        <h2>Patient EEG Assessment</h2>
+      </div>
+      <div class="predict-grid">
+        <form id="patientForm" class="panel">
+          <h3>Patient Details</h3>
+          <label>Full Name<input name="name" placeholder="Patient name"></label>
+          <div class="two">
+            <label>Age<input name="age" type="number" min="1" max="120" value="65"></label>
+            <label>Gender<select name="gender"><option>Select</option><option>Male</option><option>Female</option><option>Other</option></select></label>
+          </div>
+        </form>
+
+        <div class="panel">
+          <div class="tabs"><button class="active" data-tab="manual">Manual</button><button data-tab="csv">CSV Upload</button></div>
+          <form id="manualForm" class="tab-body active">
+            {% for region, cols in regions.items() %}
+              <h4>{{ region }} Region</h4>
+              <div class="channels">
+                {% for ch in cols %}<label>{{ ch }}<input name="{{ ch }}" type="number" step="0.0001" value="0"></label>{% endfor %}
+              </div>
+            {% endfor %}
+            <button class="primary full">Run Detection</button>
+          </form>
+          <form id="csvForm" class="tab-body">
+            <label class="drop">Upload one or more CSV files<input name="files" type="file" accept=".csv" multiple></label>
+            <button class="primary full">Analyse Files</button>
+          </form>
+        </div>
+      </div>
+      <p id="status"></p>
+      <div id="results" class="results"></div>
+    </section>
+
+    <section id="about">
+      <div class="section-title"><p class="eyebrow">About</p><h2>Project Overview</h2></div>
+      <div class="info-grid">
+        <article><b>Problem</b><p>Alzheimer's disease is a progressive neurological disorder where early screening can support faster clinical follow-up.</p></article>
+        <article><b>Approach</b><p>The system analyses EEG channel values and transforms them into statistical, energy, asymmetry, and regional features.</p></article>
+        <article><b>Dataset</b><p>16 EEG channels are used from frontal, central, temporal, and parietal brain regions.</p></article>
+        <article><b>Output</b><p>The model returns a confidence probability mapped into four risk bands with recommendations and a PDF report.</p></article>
+      </div>
+    </section>
+
+    <section id="algorithm">
+      <div class="section-title"><p class="eyebrow">Algorithm</p><h2>XGBoost Classifier Pipeline</h2></div>
+      <div class="timeline">
+        <div><span>1</span><b>EEG Input</b><p>16 raw channel values are collected manually or through CSV upload.</p></div>
+        <div><span>2</span><b>Feature Engineering</b><p>Mean, variance, skewness, kurtosis, RMS, IQR, energy, ratios, and regional features are calculated.</p></div>
+        <div><span>3</span><b>Scaling</b><p>The saved scaler normalises the engineered features before inference.</p></div>
+        <div><span>4</span><b>Prediction</b><p>The trained model returns the Alzheimer's risk confidence probability.</p></div>
+      </div>
+    </section>
+
+    <section id="eeg">
+      <div class="section-title"><p class="eyebrow">EEG Guide</p><h2>Brain Regions and Channels</h2></div>
+      <div class="info-grid">
+        <article><b>Frontal</b><p>Fp1, Fp2, F3, F4, F7, F8, Fz. Linked with memory, planning, and executive function.</p></article>
+        <article><b>Central</b><p>C3, C4, Cz. Related to motor and sensory processing.</p></article>
+        <article><b>Temporal</b><p>T3, T4, T5. Important for memory encoding and early cognitive changes.</p></article>
+        <article><b>Parietal</b><p>P3, P4, Pz. Associated with attention and spatial awareness.</p></article>
+      </div>
+    </section>
+  </main>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
